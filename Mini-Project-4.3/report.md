@@ -1,0 +1,13 @@
+# Report: when the cloud path meets the deadline
+
+Section 4.9 argues that a latency-sensitive IoT pipeline must keep acquisition, transport, processing and actuation inside a bounded end-to-end budget, and that edge computing shortens that budget by processing close to the sensor. Section 4.8 makes the matching point for wireless links: URLLC targets bounded, deterministic latency, not a low average. Our simulation of 20 000 decisions against a 100 ms deadline supports both statements.
+
+The edge path takes a median 25 ms for an easy decision and 70 ms for a hard one (20 % of events), with no network. Its mean is 35.1 ms and its worst case 147.0 ms, and it met the deadline for 99.21 % of events at every congestion level. The cloud path has a faster server but adds two network legs with heavy-tailed congestion spikes.
+
+At congestion 0 the cloud path is the better of the two, with 99.73 % compliance against 99.21 %, because the server handles hard decisions faster than the limited local hardware. As congestion rises, compliance falls: 95.56 % at the baseline level 0.3, 88.80 % at 0.6 and 78.95 % at 0.9. The cloud stays above 99 % only up to congestion 0.06 and above 95 % up to 0.32. It never reaches 99.9 %, not even at zero congestion.
+
+The mean hides this. At baseline the cloud mean is 55.5 ms, well inside the deadline, but the 99th percentile is 175.3 ms and the worst case 7 604.7 ms. A spike distribution with a power-law tail has no useful bound, which is why Section 4.8 stresses bounded latency: an average-compliant link can still miss one decision in twenty. The cloud meets the deadline only when the network is lightly loaded, when the deadline is relaxed (98.56 % at 150 ms and 99.25 % at 200 ms), or when occasional misses are acceptable. For a 50 ms deadline every architecture failed (below 84 %).
+
+The hybrid policy runs a 5 ms edge pre-check, keeps easy decisions local and sends only hard ones to the cloud. It lowered the 95th percentile to 64.8 ms at baseline and reached 98.84 % compliance, better than the pure cloud, but it still depends on the network for 20 % of events and so inherits the tail (worst case 1 116.6 ms). Computing hard events locally in parallel with the cloud request and taking the first answer produced 99.89 % compliance and a worst case of 120.6 ms, because the edge bounds the latency. This hedge costs local energy and compute on every hard event.
+
+These results use assumed latency models, so the thresholds are specific to them. The conclusion is that the cloud is acceptable only as a best-effort path, and a deadline-critical decision needs a local path that bounds the worst case.
